@@ -10,11 +10,16 @@ struct init_params {
 };
 
 init_params parseInitParameters(int argc, char *const *argv);
+void runWorker(init_params);
 
 int main(int argc, char **argv)
 {
+	//parse init parameters:
 	init_params init_params = parseInitParameters(argc, argv);
-
+	
+	//run main program:
+	runWorker(init_params);
+	
 	return EXIT_SUCCESS;
 }
 
@@ -57,13 +62,24 @@ init_params parseInitParameters(int argc, char *const *argv) {
 	}
 
 	if (verbose) {
+		puts("");
 		puts("Printing parameter values:");
 		printf("Parameter e = %d\n", init_params.e);
 		printf("Parameter i = %d\n", init_params.i);
-		printf("Parameter w = %s", init_params.w);
+		printf("Parameter w = %s\n", init_params.w);
 
+		puts("========================");
 		puts("");
 	}
 	
 	return init_params;
+}
+
+void runWorker(init_params init_params) {
+	char command[256];
+	snprintf(command, sizeof command, "%s%d%s%d%s%s%s%d%s%d", "mpirun -n 1 -host vnode-01 ./../helloWorldMpich2.out ", 
+		init_params.e, " ",init_params.i, " : -n 1 -host ", init_params.w, 
+			" ./../helloWorldMpich2.out ", init_params.e, " ",init_params.i);
+	
+	system(command);
 }
